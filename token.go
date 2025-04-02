@@ -1,64 +1,86 @@
 package main
 
-type TokenType string
+type TokenTag int
 
 type Token struct {
-	Type    TokenType
-	Literal string
+	tag   TokenTag
+	start int
 }
 
 const (
-	ILLEGAL = "ILLEGAL"
-	EOF     = "EOF"
-
-	// Identifiers and literals
-	IDENT = "IDENT" // x, y, foo, bar, etc.
-	INT   = "INT"   // 1, 2, 3, 4, etc.
-
-	// Operators
-	ASSIGN   = "="
-	PLUS     = "+"
-	MINUS    = "-"
-	BANG     = "!"
-	ASTERISK = "*"
-	SLASH    = "/"
-	LT       = "<"
-	GT       = ">"
-	EQ       = "=="
-	NOT_EQ   = "!="
-
-	// Delimiters
-	COMMA     = ","
-	SEMICOLON = ";"
-	LPAREN    = "("
-	RPAREN    = ")"
-	LBRACE    = "{"
-	RBRACE    = "}"
-
-	// Keywords
-	FUNCTION = "FUNCTION"
-	LET      = "LET"
-	TRUE     = "TRUE"
-	FALSE    = "FALSE"
-	IF       = "IF"
-	ELSE     = "ELSE"
-	RETURN   = "RETURN"
+	illegal TokenTag = iota
+	eof
+	identifier
+	numberLiteral
+	equal
+	plus
+	minus
+	bang
+	asterisk
+	slash
+	lAngleBracket
+	rAngleBracket
+	equalEqual
+	bangEqual
+	comma
+	semicolon
+	lParen
+	rParen
+	lBrace
+	rBrace
+	keywordFn
+	keywordLet
+	keywordTrue
+	keywordFalse
+	keywordIf
+	keywordElse
+	keywordReturn
 )
 
-var keywords = map[string]TokenType{
-	"fn":     FUNCTION,
-	"let":    LET,
-	"true":   TRUE,
-	"false":  FALSE,
-	"if":     IF,
-	"else":   ELSE,
-	"return": RETURN,
+var tagString = map[TokenTag]string{
+	illegal:       "illegal",
+	eof:           "EOF",
+	identifier:    "identifier",
+	numberLiteral: "numberLiteral",
+	equal:         "equal",
+	plus:          "plus",
+	minus:         "minus",
+	bang:          "bang",
+	asterisk:      "asterisk",
+	slash:         "slash",
+	lAngleBracket: "lAngleBracket",
+	rAngleBracket: "rAngleBracket",
+	equalEqual:    "equalEqual",
+	bangEqual:     "bangEqual",
+	comma:         "comma",
+	semicolon:     "semicolon",
+	lParen:        "lParen",
+	rParen:        "rParen",
+	lBrace:        "lBrace",
+	rBrace:        "rBrace",
+	keywordFn:     "keywordFn",
+	keywordLet:    "keywordLet",
+	keywordTrue:   "keywordTrue",
+	keywordFalse:  "keywordFalse",
+	keywordIf:     "keywordIf",
+	keywordElse:   "keywordElse",
+	keywordReturn: "keywordReturn",
 }
 
-func lookupIdent(ident string) TokenType {
+var keywords = map[string]TokenTag{
+	"fn":     keywordFn,
+	"let":    keywordLet,
+	"true":   keywordTrue,
+	"false":  keywordFalse,
+	"if":     keywordIf,
+	"else":   keywordElse,
+	"return": keywordReturn,
+}
+
+func lookupIdent(ident string) TokenTag {
 	if tok, ok := keywords[ident]; ok {
 		return tok
 	}
 
-	return IDENT
+	return identifier
 }

@@ -2,7 +2,7 @@ package main
 
 type Lexer struct {
 	input        string
-	position     int
+	index        int
 	readPosition int
 	ch           byte
 }
@@ -11,10 +11,6 @@ func newLexer(input string) *Lexer {
 	l := Lexer{input: input}
 	l.readChar()
 	return &l
-}
-
-func newToken(tokenType TokenType, ch byte) Token {
-	return Token{Type: tokenType, Literal: string(ch)}
 }
 
 func isLetter(ch byte) bool {
@@ -32,7 +28,7 @@ func (l *Lexer) readChar() {
 		l.ch = l.input[l.readPosition]
 	}
 
-	l.position = l.readPosition
+	l.index = l.readPosition
 	l.readPosition += 1
 }
 
@@ -51,23 +47,23 @@ func (l *Lexer) skipWhitespace() {
 }
 
 func (l *Lexer) readIdentifier() string {
-	begin := l.position
+	begin := l.index
 
 	for isLetter(l.ch) {
 		l.readChar()
 	}
 
-	return l.input[begin:l.position]
+	return l.input[begin:l.index]
 }
 
 func (l *Lexer) readNumber() string {
-	begin := l.position
+	begin := l.index
 
 	for isDigit(l.ch) {
 		l.readChar()
 	}
 
-	return l.input[begin:l.position]
+	return l.input[begin:l.index]
 }
 
 func (l *Lexer) nextToken() Token {
@@ -75,58 +71,60 @@ func (l *Lexer) nextToken() Token {
 
 	l.skipWhitespace()
 
+	tok.start = l.index
+
 	switch l.ch {
 	case '=':
 		if l.peakChar() == '=' {
 			l.readChar()
-			tok = Token{Type: EQ, Literal: "=="}
+			tok.tag = equalEqual
 		} else {
-			tok = newToken(ASSIGN, l.ch)
+			tok.tag = equal
 		}
 	case '+':
-		tok = newToken(PLUS, l.ch)
+		tok.tag = plus
 	case '-':
-		tok = newToken(MINUS, l.ch)
+		tok.tag = minus
 	case '!':
 		if l.peakChar() == '=' {
 			l.readChar()
-			tok = Token{Type: NOT_EQ, Literal: "!="}
+			tok.tag = bangEqual
 		} else {
-			tok = newToken(BANG, l.ch)
+			tok.tag = bang
 		}
 	case '/':
-		tok = newToken(SLASH, l.ch)
+		tok.tag = slash
 	case '*':
-		tok = newToken(ASTERISK, l.ch)
+		tok.tag = asterisk
 	case '<':
-		tok = newToken(LT, l.ch)
+		tok.tag = lAngleBracket
 	case '>':
-		tok = newToken(GT, l.ch)
+		tok.tag = rAngleBracket
 	case ',':
-		tok = newToken(COMMA, l.ch)
+		tok.tag = comma
 	case ';':
-		tok = newToken(SEMICOLON, l.ch)
+		tok.tag = semicolon
 	case '(':
-		tok = newToken(LPAREN, l.ch)
+		tok.tag = lParen
 	case ')':
-		tok = newToken(RPAREN, l.ch)
+		tok.tag = rParen
 	case '{':
-		tok = newToken(LBRACE, l.ch)
+		tok.tag = lBrace
 	case '}':
-		tok = newToken(RBRACE, l.ch)
+		tok.tag = rBrace
 	case 0:
-		tok = newToken(EOF, l.ch)
+		tok.tag = eof
 	default:
 		if isLetter(l.ch) {
-			tok.Literal = l.readIdentifier()
-			tok.Type = lookupIdent(tok.Literal)
+			identifier := l.readIdentifier()
+			tok.tag = lookupIdent(identifier)
 			return tok
 		} else if isDigit(l.ch) {
-			tok.Type = INT
-			tok.Literal = l.readNumber()
+			l.readNumber()
+			tok.tag = numberLiteral
 			return tok
 		} else {
-			tok = newToken(ILLEGAL, l.ch)
+			tok.tag = illegal
 		}
 	}
 

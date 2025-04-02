@@ -21,7 +21,7 @@ func startRepl(in io.Reader, out io.Writer) {
 		line := scanner.Text()
 		l := newLexer(line)
 
-		for tok := l.nextToken(); tok.Type != EOF; tok = l.nextToken() {
+		for tok := l.nextToken(); tok.tag != eof; tok = l.nextToken() {
 			fmt.Fprint(out, tok, "\n")
 		}
 	}

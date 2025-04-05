@@ -114,6 +114,7 @@ func (l *Lexer) nextToken() Token {
 		}
 	}
 
+	tok.end = l.index
 	l.index += 1
 	return tok
 }

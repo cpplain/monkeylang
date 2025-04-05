@@ -25,23 +25,23 @@ if (5 < 10) {
 `
 
 	test := []struct {
-		expectedTag       TokenTag
-		expectedFirstChar string
+		expectedTag    TokenTag
+		expectedString string
 	}{
-		{keywordLet, "l"},
-		{identifier, "f"},
+		{keywordLet, "let"},
+		{identifier, "five"},
 		{equal, "="},
 		{numberLiteral, "5"},
 		{semicolon, ";"},
-		{keywordLet, "l"},
-		{identifier, "t"},
+		{keywordLet, "let"},
+		{identifier, "ten"},
 		{equal, "="},
-		{numberLiteral, "1"},
+		{numberLiteral, "10"},
 		{semicolon, ";"},
-		{keywordLet, "l"},
-		{identifier, "a"},
+		{keywordLet, "let"},
+		{identifier, "add"},
 		{equal, "="},
-		{keywordFn, "f"},
+		{keywordFn, "fn"},
 		{lParen, "("},
 		{identifier, "x"},
 		{comma, ","},
@@ -54,14 +54,14 @@ if (5 < 10) {
 		{semicolon, ";"},
 		{rBrace, "}"},
 		{semicolon, ";"},
-		{keywordLet, "l"},
-		{identifier, "r"},
+		{keywordLet, "let"},
+		{identifier, "result"},
 		{equal, "="},
-		{identifier, "a"},
+		{identifier, "add"},
 		{lParen, "("},
-		{identifier, "f"},
+		{identifier, "five"},
 		{comma, ","},
-		{identifier, "t"},
+		{identifier, "ten"},
 		{rParen, ")"},
 		{semicolon, ";"},
 		{bang, "!"},
@@ -72,33 +72,33 @@ if (5 < 10) {
 		{semicolon, ";"},
 		{numberLiteral, "5"},
 		{lAngleBracket, "<"},
-		{numberLiteral, "1"},
+		{numberLiteral, "10"},
 		{rAngleBracket, ">"},
 		{numberLiteral, "5"},
 		{semicolon, ";"},
-		{keywordIf, "i"},
+		{keywordIf, "if"},
 		{lParen, "("},
 		{numberLiteral, "5"},
 		{lAngleBracket, "<"},
-		{numberLiteral, "1"},
+		{numberLiteral, "10"},
 		{rParen, ")"},
 		{lBrace, "{"},
-		{keywordReturn, "r"},
-		{keywordTrue, "t"},
+		{keywordReturn, "return"},
+		{keywordTrue, "true"},
 		{semicolon, ";"},
 		{rBrace, "}"},
-		{keywordElse, "e"},
+		{keywordElse, "else"},
 		{lBrace, "{"},
-		{keywordReturn, "r"},
-		{keywordFalse, "f"},
+		{keywordReturn, "return"},
+		{keywordFalse, "false"},
 		{semicolon, ";"},
 		{rBrace, "}"},
-		{numberLiteral, "1"},
-		{equalEqual, "="},
-		{numberLiteral, "1"},
+		{numberLiteral, "10"},
+		{equalEqual, "=="},
+		{numberLiteral, "10"},
 		{semicolon, ";"},
-		{numberLiteral, "1"},
-		{bangEqual, "!"},
+		{numberLiteral, "10"},
+		{bangEqual, "!="},
 		{numberLiteral, "9"},
 		{semicolon, ";"},
 		{eof, ""},
@@ -114,9 +114,9 @@ if (5 < 10) {
 				i, tagString[tt.expectedTag], tagString[tok.tag])
 		}
 
-		if tok.tag != eof && string(l.input[tok.start]) != tt.expectedFirstChar {
-			t.Fatalf("test[%d]: wrong first char: expected='%s', actual='%s'",
-				i, tt.expectedFirstChar, string(l.input[tok.start]))
+		if tok.tag != eof && l.input[tok.start:tok.end+1] != tt.expectedString {
+			t.Fatalf("test[%d]: wrong string: expected='%s', actual='%s'",
+				i, tt.expectedString, l.input[tok.start:tok.end+1])
 		}
 	}
 }

@@ -5,6 +5,7 @@ type TokenTag int
 type Token struct {
 	tag   TokenTag
 	start int
+	end   int
 }
 
 const (

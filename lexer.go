@@ -1,16 +1,12 @@
 package main
 
 type Lexer struct {
-	input        string
-	index        int
-	readPosition int
-	ch           byte
+	input string
+	index int
 }
 
 func newLexer(input string) *Lexer {
-	l := Lexer{input: input}
-	l.readChar()
-	return &l
+	return &Lexer{input, 0}
 }
 
 func isLetter(ch byte) bool {
@@ -21,62 +17,54 @@ func isDigit(ch byte) bool {
 	return '0' <= ch && ch <= '9'
 }
 
-func (l *Lexer) readChar() {
-	if l.readPosition >= len(l.input) {
-		l.ch = 0
-	} else {
-		l.ch = l.input[l.readPosition]
+func (l *Lexer) readChar() byte {
+	if l.index >= len(l.input) {
+		return 0
 	}
 
-	l.index = l.readPosition
-	l.readPosition += 1
+	return l.input[l.index]
 }
 
-func (l *Lexer) peakChar() byte {
-	if l.readPosition >= len(l.input) {
+func (l *Lexer) peekChar() byte {
+	if l.index+1 >= len(l.input) {
 		return 0
-	} else {
-		return l.input[l.readPosition]
 	}
+
+	return l.input[l.index+1]
 }
 
 func (l *Lexer) skipWhitespace() {
-	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
-		l.readChar()
+	for l.readChar() == ' ' || l.readChar() == '\t' || l.readChar() == '\n' || l.readChar() == '\r' {
+		l.index += 1
 	}
 }
 
 func (l *Lexer) readIdentifier() string {
-	begin := l.index
+	start := l.index
 
-	for isLetter(l.ch) {
-		l.readChar()
+	for isLetter(l.peekChar()) {
+		l.index += 1
 	}
 
-	return l.input[begin:l.index]
+	return l.input[start : l.index+1]
 }
 
-func (l *Lexer) readNumber() string {
-	begin := l.index
-
-	for isDigit(l.ch) {
-		l.readChar()
+func (l *Lexer) readNumber() {
+	for isDigit(l.peekChar()) {
+		l.index += 1
 	}
-
-	return l.input[begin:l.index]
 }
 
 func (l *Lexer) nextToken() Token {
-	var tok Token
-
 	l.skipWhitespace()
 
-	tok.start = l.index
+	tok := Token{start: l.index}
+	ch := l.readChar()
 
-	switch l.ch {
+	switch ch {
 	case '=':
-		if l.peakChar() == '=' {
-			l.readChar()
+		if l.peekChar() == '=' {
+			l.index += 1
 			tok.tag = equalEqual
 		} else {
 			tok.tag = equal
@@ -86,8 +74,8 @@ func (l *Lexer) nextToken() Token {
 	case '-':
 		tok.tag = minus
 	case '!':
-		if l.peakChar() == '=' {
-			l.readChar()
+		if l.peekChar() == '=' {
+			l.index += 1
 			tok.tag = bangEqual
 		} else {
 			tok.tag = bang
@@ -115,19 +103,17 @@ func (l *Lexer) nextToken() Token {
 	case 0:
 		tok.tag = eof
 	default:
-		if isLetter(l.ch) {
+		if isLetter(ch) {
 			identifier := l.readIdentifier()
 			tok.tag = lookupIdent(identifier)
-			return tok
-		} else if isDigit(l.ch) {
+		} else if isDigit(ch) {
 			l.readNumber()
 			tok.tag = numberLiteral
-			return tok
 		} else {
 			tok.tag = illegal
 		}
 	}
 
-	l.readChar()
+	l.index += 1
 	return tok
 }

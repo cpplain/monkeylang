@@ -105,10 +105,10 @@ if (5 < 10) {
 	}
 
 	l := newLexer(input)
+	l.tokenize()
 
 	for i, tt := range test {
-		tok := l.nextToken()
-
+		tok := l.tokens[i]
 		if tok.tag != tt.expectedTag {
 			t.Fatalf("test[%d]: wrong tag: expected='%s', actual='%s'",
 				i, tagString[tt.expectedTag], tagString[tok.tag])

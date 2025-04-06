@@ -20,8 +20,9 @@ func startRepl(in io.Reader, out io.Writer) {
 
 		line := scanner.Text()
 		l := newLexer(line)
+		l.tokenize()
 
-		for tok := l.nextToken(); tok.tag != eof; tok = l.nextToken() {
+		for tok := range l.tokens {
 			fmt.Fprint(out, tok, "\n")
 		}
 	}
